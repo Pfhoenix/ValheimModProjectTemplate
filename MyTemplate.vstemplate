@@ -3,9 +3,10 @@
     <Name>Valheim Mod Project Template</Name>
     <Description>Creates a project with all references set and an initial Plugin class ready to go.</Description>
     <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+	<ProjectSubType>Windows</ProjectSubType>
+	<LanguageTag>CSharp</LanguageTag>
+	<PlatformTag>Windows</PlatformTag>
+	<SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Valheim Mod Project Template</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
