@@ -25,7 +25,7 @@ namespace $safeprojectname$
 
 		private void OnDestroy()
 		{
-			if (_Harmony != null) _Harmony.UnpatchAll(null);
+			if (_Harmony != null) _Harmony.UnpatchSelf();
 		}
 	}
 }
