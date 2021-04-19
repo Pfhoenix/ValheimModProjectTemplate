@@ -34,7 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="0Harmony, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Pfhoenix.Valheim.ModProjectReferences.1.0.5\lib\net46\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -74,7 +74,7 @@
       <HintPath>..\packages\Pfhoenix.Valheim.ModProjectReferences.1.0.5\lib\net46\assembly_valheim.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BepInEx, Version=5.4.8.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BepInEx, Version=5.4.9.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Pfhoenix.Valheim.ModProjectReferences.1.0.5\lib\net46\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
