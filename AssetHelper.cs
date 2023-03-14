@@ -57,8 +57,25 @@ namespace $safeprojectname$
 
 		public static void RegisterPrefab(GameObject prefab)
 		{
+			if (ZNetScene.instance && ZNetScene.instance.GetPrefab(prefab.name)) return;
+
 			Prefabs.Add(prefab);
-			GameObject.DontDestroyOnLoad(prefab);
+			//GameObject.DontDestroyOnLoad(prefab);
+
+			if (ZNetScene.instance)
+			{
+				ZNetScene.instance.m_namedPrefabs[prefab.name.GetStableHashCode()] = prefab;
+				ObjectDB.m_instance.m_itemByHash[prefab.name.GetStableHashCode()] = prefab;
+			}
+		}
+
+		public static GameObject CreateNewPrefab(string name, string originalPrefab)
+		{
+			GameObject go = GameObject.Instantiate(ZNetScene.instance.GetPrefab(originalPrefab), Plugin.PrefabOwner.transform);
+			go.name = name;
+			RegisterPrefab(go);
+
+			return go;
 		}
 
 		public static void RegisterRecipe(RecipeStub rs)
@@ -78,6 +95,8 @@ namespace $safeprojectname$
 
 		public static Recipe BuildRecipe(RecipeStub rs, ObjectDB odb)
 		{
+			if (!ZNetScene.instance) return null;
+
 			var recipe = ScriptableObject.CreateInstance<Recipe>();
 			recipe.m_item = rs.Item;
 			recipe.m_craftingStation = odb.GetItemPrefab(rs.CraftingStation)?.GetComponentInChildren<CraftingStation>(true);
@@ -131,7 +150,9 @@ namespace $safeprojectname$
 			if (Prefabs.Count > 0 && !odb.m_items.Find(p => p.name == Prefabs[0].name))
 			{
 				foreach (var p in Prefabs)
+				{
 					if (p.GetComponentInChildren<ItemDrop>(true)) odb.m_items.Add(p);
+				}
 
 				odb.UpdateItemHashes();
 			}
@@ -173,6 +194,13 @@ namespace $safeprojectname$
 			}
 		}
 
+		public static void AssetCleanup()
+		{
+			Prefabs.Clear();
+			RecipeStubs.Clear();
+			StatusEffects.Clear();
+		}
+
 		[HarmonyPostfix]
 		[HarmonyPatch(typeof(ObjectDB), "Awake")]
 		public static void AwakePostfix(ObjectDB __instance)
@@ -187,15 +215,39 @@ namespace $safeprojectname$
 			PopulateObjectDB(__instance);
 		}
 
-		[HarmonyPostfix]
+		public delegate void CustomPrefabsDelegate();
+		public static event CustomPrefabsDelegate PreCustomPrefabRegistration;
+		public static event CustomPrefabsDelegate PostCustomPrefabRegistration;
+
+		[HarmonyFinalizer]
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
-		public static void AwakePostfix(ZNetScene __instance)
+		[HarmonyPriority(Priority.Last)]
+		public static void AwakeFinalizer(ZNetScene __instance)
 		{
-			if (Prefabs.Count == 0) return;
+			PreCustomPrefabRegistration?.Invoke();
 
 			foreach (var p in Prefabs)
 				__instance.m_namedPrefabs[p.name.GetStableHashCode()] = p;
+
+			PostCustomPrefabRegistration?.Invoke();
 		}
+
+#if DEBUG
+		[HarmonyPatch(typeof(Terminal), "Awake")]
+		[HarmonyPostfix]
+		public static void AwakePostfix(Terminal __instance)
+		{
+			new Terminal.ConsoleCommand("test", "enables my common test cheat setup", delegate (Terminal.ConsoleEventArgs args)
+			{
+				if (!ZNetScene.instance) return;
+
+				if (!Terminal.m_cheat) Console.instance.TryRunCommand("devcommands", true, true);
+				Console.instance.TryRunCommand("god", true, true);
+				Console.instance.TryRunCommand("ghost", true, true);
+				Console.instance.TryRunCommand("nocost", true, true);
+			});
+		}
+#endif
 
 		/*[HarmonyPatch(typeof(UnityEngine.Object), "Destroy", new Type[] { typeof(UnityEngine.Object) })]
 		public class ObjectPatches
