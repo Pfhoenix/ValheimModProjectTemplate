@@ -60,7 +60,7 @@ namespace $safeprojectname$
 			if (ZNetScene.instance && ZNetScene.instance.GetPrefab(prefab.name)) return;
 
 			Prefabs.Add(prefab);
-			//GameObject.DontDestroyOnLoad(prefab);
+			GameObject.DontDestroyOnLoad(prefab);
 
 			if (ZNetScene.instance)
 			{
